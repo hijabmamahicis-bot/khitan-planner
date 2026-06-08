@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Khitan Planner 🏎️</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F8F7F4;
+  --surface: #FFFFFF;
+  --border: #E8E4DC;
+  --border-strong: #C8C2B4;
+  --text: #1A1814;
+  --text-2: #6B6558;
+  --text-3: #A09890;
+  --accent: #1A3A5C;
+  --accent-light: #E8EFF6;
+  --gold: #B8860B;
+  --gold-light: #FDF6E3;
+  --red: #C0392B;
+  --red-light: #FDECEA;
+  --amber: #B7770D;
+  --amber-light: #FDF3DC;
+  --green: #1A6B3C;
+  --green-light: #E8F6EE;
+  --purple: #4A3580;
+  --purple-light: #EEEAFC;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 20px 0;
+  position: sticky; top: 0; z-index: 100;
+}
+.header-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.app-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; color: var(--text);
+  display: flex; align-items: center; gap: 8px;
+}
+.app-name span { font-size: 18px; }
+.sync-badge {
+  font-size: 11px; padding: 3px 10px; border-radius: 20px;
+  background: var(--green-light); color: var(--green);
+  font-weight: 500; display: flex; align-items: center; gap: 4px;
+}
+.sync-badge.offline { background: var(--amber-light); color: var(--amber); }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ── TABS ── */
+.tabs { display: flex; gap: 0; }
+.tab {
+  flex: 1; text-align: center; padding: 10px 6px 11px;
+  font-size: 12px; font-weight: 500; color: var(--text-3);
+  border-bottom: 2px solid transparent;
+  cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-icon { font-size: 15px; }
+
+/* ── PAGES ── */
+.page { display: none; padding: 16px 16px 0; animation: fadeIn .2s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── SETUP SCREEN ── */
+.setup-screen {
+  position: fixed; inset: 0; background: var(--bg);
+  z-index: 999; display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.setup-card {
+  background: var(--surface); border-radius: var(--radius);
+  padding: 28px 24px; width: 100%; max-width: 400px;
+  box-shadow: var(--shadow); border: 1px solid var(--border);
+}
+.setup-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; margin-bottom: 6px; color: var(--text);
+}
+.setup-sub { font-size: 13px; color: var(--text-2); margin-bottom: 20px; line-height: 1.6; }
+.setup-step {
+  background: var(--bg); border-radius: var(--radius-sm);
+  padding: 12px 14px; margin-bottom: 8px;
+  font-size: 12px; color: var(--text-2); line-height: 1.7;
+  border: 1px solid var(--border);
+}
+.setup-step strong { color: var(--text); display: block; font-size: 13px; margin-bottom: 2px; }
+.setup-step code {
+  background: var(--accent-light); color: var(--accent);
+  padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;
+}
+.input-group { margin-bottom: 10px; }
+.input-label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
+.input-field {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px; background: var(--bg);
+  color: var(--text); font-family: 'DM Sans', sans-serif;
+  transition: border-color .2s;
+}
+.input-field:focus { outline: none; border-color: var(--accent); }
+.btn-primary {
+  width: 100%; padding: 12px; background: var(--accent);
+  color: #fff; border: none; border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; margin-top: 6px;
+  transition: opacity .2s;
+}
+.btn-primary:hover { opacity: .9; }
+.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+.btn-link {
+  width: 100%; padding: 10px; background: transparent;
+  color: var(--text-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 6px;
+}
+
+/* ── SUMMARY CARDS ── */
+.summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.sum-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+}
+.sum-label { font-size: 11px; color: var(--text-3); margin-bottom: 4px; font-weight: 500; }
+.sum-val { font-size: 22px; font-weight: 600; color: var(--text); }
+.sum-val.blue { color: var(--accent); }
+.sum-val.green { color: var(--green); }
+.sum-val.gold { color: var(--gold); }
+.sum-val.small { font-size: 14px; }
+
+/* ── FILTER ── */
+.filter-section { margin-bottom: 10px; }
+.filter-label { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.chip-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.chip {
+  padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 500;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-2); cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 10px 0 12px; }
+
+/* ── TODO CARD ── */
+.todo-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+  margin-bottom: 8px; transition: box-shadow .2s;
+}
+.todo-card:hover { box-shadow: var(--shadow); }
+.todo-row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.todo-name { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; flex: 1; }
+.todo-name.done { text-decoration: line-through; color: var(--text-3); }
+.todo-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-bottom: 8px; }
+.todo-field { font-size: 11px; color: var(--text-3); }
+.todo-field b { color: var(--text-2); font-weight: 500; }
+.progress-wrap { }
+.progress-top { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-3); margin-bottom: 4px; }
+.progress-bg { background: var(--border); border-radius: 4px; height: 5px; overflow: hidden; }
+.progress-fill { height: 5px; border-radius: 4px; transition: width .4s ease; }
+.todo-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.btn-icon {
+  padding: 4px 10px; border: 1px solid var(--border); border-radius: 6px;
+  background: transparent; font-size: 11px; color: var(--text-2);
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s;
+  display: flex; align-items: center; gap: 4px;
+}
+.btn-icon:hover { background: var(--bg); }
+.btn-icon.danger:hover { background: var(--red-light); color: var(--red); border-color: var(--red); }
+.btn-icon.success:hover { background: var(--green-light); color: var(--green); border-color: var(--green); }
+
+/* ── ANGGARAN CARD ── */
+.ang-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+  margin-bottom: 8px; transition: box-shadow .2s;
+}
+.ang-card:hover { box-shadow: var(--shadow); }
+.ang-row1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.ang-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.ang-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 4px; }
+.ang-field { font-size: 11px; color: var(--text-3); }
+.ang-field b { color: var(--text); font-weight: 500; display: block; font-size: 12px; }
+.ang-progress-bg { background: var(--border); border-radius: 4px; height: 4px; margin-top: 6px; overflow: hidden; }
+.ang-progress-fill { height: 4px; border-radius: 4px; background: var(--accent); transition: width .4s; }
+.ang-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.budget-bar-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px;
+}
+.budget-bar-header { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2); margin-bottom: 8px; }
+.budget-bar-bg { background: var(--border); border-radius: 6px; height: 8px; overflow: hidden; }
+.budget-bar-fill { height: 8px; border-radius: 6px; background: var(--accent); transition: width .4s; }
+
+/* ── TAMU CARD ── */
+.tamu-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px 14px;
+  margin-bottom: 8px; transition: box-shadow .2s;
+}
+.tamu-card:hover { box-shadow: var(--shadow); }
+.tamu-row1 { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.tamu-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.tamu-row2 { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-bottom: 4px; }
+.tamu-jumlah { font-size: 11px; color: var(--text-3); }
+.tamu-actions { display: flex; justify-content: flex-end; gap: 6px; margin-top: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.counter-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.counter-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 8px; text-align: center;
+}
+.counter-num { font-size: 20px; font-weight: 600; color: var(--text); }
+.counter-label { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block; padding: 3px 8px; border-radius: 6px;
+  font-size: 10px; font-weight: 600; white-space: nowrap;
+}
+.b-red { background: var(--red-light); color: var(--red); }
+.b-amber { background: var(--amber-light); color: var(--amber); }
+.b-green { background: var(--green-light); color: var(--green); }
+.b-blue { background: var(--accent-light); color: var(--accent); }
+.b-gray { background: var(--bg); color: var(--text-3); border: 1px solid var(--border); }
+.b-purple { background: var(--purple-light); color: var(--purple); }
+.b-gold { background: var(--gold-light); color: var(--gold); }
+
+/* ── ADD BUTTON ── */
+.add-btn {
+  width: 100%; padding: 12px; border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius); background: transparent; color: var(--text-3);
+  font-size: 13px; cursor: pointer; margin-bottom: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  font-family: 'DM Sans', sans-serif; transition: all .2s;
+}
+.add-btn:hover { background: var(--surface); color: var(--accent); border-color: var(--accent); }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-item {
+  flex: 1; padding: 10px 6px 12px; text-align: center;
+  cursor: pointer; color: var(--text-3); transition: color .2s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.nav-item.active { color: var(--accent); }
+.nav-icon { font-size: 20px; }
+.nav-label { font-size: 10px; font-weight: 500; }
+.nav-badge {
+  position: absolute; top: 6px; right: calc(50% - 18px);
+  background: var(--red); color: #fff; border-radius: 10px;
+  font-size: 9px; font-weight: 700; padding: 1px 5px; min-width: 16px;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  z-index: 200; display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity .25s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface); border-radius: 20px 20px 0 0;
+  padding: 20px 20px 32px; width: 100%; max-width: 480px;
+  transform: translateY(100%); transition: transform .3s cubic-bezier(.4,0,.2,1);
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 16px; color: var(--text); }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 5px; display: block; text-transform: uppercase; letter-spacing: .5px; }
+.form-input {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px;
+  background: var(--bg); color: var(--text);
+  font-family: 'DM Sans', sans-serif; transition: border-color .2s;
+}
+.form-input:focus { outline: none; border-color: var(--accent); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-select {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px; background: var(--bg);
+  color: var(--text); font-family: 'DM Sans', sans-serif; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 32px;
+}
+.form-select:focus { outline: none; border-color: var(--accent); }
+.range-wrap { display: flex; align-items: center; gap: 10px; }
+.form-range { flex: 1; accent-color: var(--accent); }
+.range-val { font-size: 13px; font-weight: 600; color: var(--accent); min-width: 36px; text-align: right; }
+.modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.btn-cancel {
+  padding: 11px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: transparent; color: var(--text-2); font-size: 13px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+.btn-save {
+  padding: 11px; background: var(--accent); border: none;
+  border-radius: var(--radius-sm); color: #fff; font-size: 13px; font-weight: 500;
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+}
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center; padding: 40px 20px; color: var(--text-3);
+}
+.empty-icon { font-size: 36px; margin-bottom: 10px; opacity: .5; }
+.empty-text { font-size: 13px; }
+
+/* ── LOADING ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: #fff; padding: 10px 18px;
+  border-radius: 20px; font-size: 12px; font-weight: 500;
+  z-index: 300; opacity: 0; transition: all .3s; pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div class="setup-screen" id="setupScreen">
+  <div class="setup-card">
+    <div class="setup-title">🏎️ Khitan Planner</div>
+    <div class="setup-sub">Sambungkan ke Firebase agar data Anda & istri sinkron real-time dari HP masing-masing.</div>
+
+    <div class="setup-step">
+      <strong>Langkah 1 — Buat project Firebase</strong>
+      Buka <code>console.firebase.google.com</code> → klik <code>Add project</code> → beri nama (misal: <code>khitan-planner</code>)
+    </div>
+    <div class="setup-step">
+      <strong>Langkah 2 — Aktifkan Firestore</strong>
+      Di sidebar klik <code>Firestore Database</code> → <code>Create database</code> → pilih <code>Start in test mode</code>
+    </div>
+    <div class="setup-step">
+      <strong>Langkah 3 — Ambil config</strong>
+      Klik ⚙️ <code>Project settings</code> → scroll ke <code>Your apps</code> → klik <code>&lt;/&gt;</code> (Web) → copy nilai dari <code>firebaseConfig</code>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">API Key</div>
+      <input class="input-field" id="cfg_apiKey" placeholder="AIzaSy..." />
+    </div>
+    <div class="input-group">
+      <div class="input-label">Project ID</div>
+      <input class="input-field" id="cfg_projectId" placeholder="khitan-planner" />
+    </div>
+    <div class="input-group">
+      <div class="input-label">App ID</div>
+      <input class="input-field" id="cfg_appId" placeholder="1:123456:web:abc123" />
+    </div>
+
+    <button class="btn-primary" onclick="connectFirebase()">🔗 Sambungkan & Mulai</button>
+    <button class="btn-link" onclick="useLocalMode()">Coba dulu tanpa Firebase (data lokal)</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header" id="mainHeader" style="display:none">
+  <div class="header-top">
+    <div class="app-name"><span>🏎️</span> Khitan Planner</div>
+    <div class="sync-badge" id="syncBadge"><div class="sync-dot"></div> Online</div>
+  </div>
+  <div class="tabs" id="headerTabs">
+    <div class="tab active" onclick="showPage('todo',0)"><span class="tab-icon">✅</span> To Do</div>
+    <div class="tab" onclick="showPage('anggaran',1)"><span class="tab-icon">💰</span> Anggaran</div>
+    <div class="tab" onclick="showPage('tamu',2)"><span class="tab-icon">👥</span> Tamu</div>
+  </div>
+</div>
+
+<!-- ════════ PAGE 1: TODO ════════ -->
+<div class="page active" id="page-todo" style="display:none">
+  <div class="summary-row">
+    <div class="sum-card"><div class="sum-label">Total tugas</div><div class="sum-val blue" id="td-total">0</div></div>
+    <div class="sum-card"><div class="sum-label">Selesai</div><div class="sum-val green" id="td-selesai">0</div></div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-label">Filter status</div>
+    <div class="chip-row" id="fs-status">
+      <div class="chip active" onclick="filterTodo('status','semua',this)">Semua</div>
+      <div class="chip" onclick="filterTodo('status','belum',this)">Belum</div>
+      <div class="chip" onclick="filterTodo('status','proses',this)">Proses</div>
+      <div class="chip" onclick="filterTodo('status','selesai',this)">Selesai</div>
+    </div>
+  </div>
+  <div class="filter-section">
+    <div class="filter-label">Filter PIC</div>
+    <div class="chip-row" id="fs-pic">
+      <div class="chip active" onclick="filterTodo('pic','semua',this)">Semua</div>
+      <div class="chip" onclick="filterTodo('pic','ayah',this)">Ayah</div>
+      <div class="chip" onclick="filterTodo('pic','ibu',this)">Ibu</div>
+      <div class="chip" onclick="filterTodo('pic','berdua',this)">Berdua</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <div id="todo-list"></div>
+  <button class="add-btn" onclick="openModal('todo')">＋ Tambah tugas</button>
+</div>
+
+<!-- ════════ PAGE 2: ANGGARAN ════════ -->
+<div class="page" id="page-anggaran" style="display:none">
+  <div class="summary-row">
+    <div class="sum-card"><div class="sum-label">Total anggaran</div><div class="sum-val blue small" id="ang-total">Rp 0</div></div>
+    <div class="sum-card"><div class="sum-label">Terpakai</div><div class="sum-val green small" id="ang-real">Rp 0</div></div>
+  </div>
+  <div class="budget-bar-card">
+    <div class="budget-bar-header">
+      <span id="ang-pct-label">0% terpakai</span>
+      <span id="ang-sisa-label">Sisa: Rp 0</span>
+    </div>
+    <div class="budget-bar-bg"><div class="budget-bar-fill" id="ang-bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-label">Filter status</div>
+    <div class="chip-row" id="fa-status">
+      <div class="chip active" onclick="filterAng('semua',this)">Semua</div>
+      <div class="chip" onclick="filterAng('belum',this)">Belum bayar</div>
+      <div class="chip" onclick="filterAng('dp',this)">DP Lunas</div>
+      <div class="chip" onclick="filterAng('lunas',this)">Lunas</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <div id="ang-list"></div>
+  <button class="add-btn" onclick="openModal('anggaran')">＋ Tambah pos anggaran</button>
+</div>
+
+<!-- ════════ PAGE 3: TAMU ════════ -->
+<div class="page" id="page-tamu" style="display:none">
+  <div class="counter-row">
+    <div class="counter-card"><div class="counter-num" id="tm-total">0</div><div class="counter-label">Total tamu</div></div>
+    <div class="counter-card"><div class="counter-num blue" id="tm-orang" style="color:var(--accent)">0</div><div class="counter-label">Total orang</div></div>
+    <div class="counter-card"><div class="counter-num" id="tm-hadir" style="color:var(--green)">0</div><div class="counter-label">Hadir</div></div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-label">Filter shift</div>
+    <div class="chip-row" id="ft-shift">
+      <div class="chip active" onclick="filterTamu('shift','semua',this)">Semua</div>
+      <div class="chip" onclick="filterTamu('shift','shift1',this)">Shift 1 · 14.30</div>
+      <div class="chip" onclick="filterTamu('shift','shift2',this)">Shift 2 · 17.00</div>
+    </div>
+  </div>
+  <div class="filter-section">
+    <div class="filter-label">Filter jenis tamu</div>
+    <div class="chip-row" id="ft-jenis">
+      <div class="chip active" onclick="filterTamu('jenis','semua',this)">Semua</div>
+      <div class="chip" onclick="filterTamu('jenis','keluarga',this)">Keluarga</div>
+      <div class="chip" onclick="filterTamu('jenis','teman',this)">Teman</div>
+      <div class="chip" onclick="filterTamu('jenis','kolega',this)">Kolega</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <div id="tamu-list"></div>
+  <button class="add-btn" onclick="openModal('tamu')">＋ Tambah tamu</button>
+</div>
+
+<!-- ════════ BOTTOM NAV ════════ -->
+<div class="bottom-nav" id="bottomNav" style="display:none">
+  <div class="nav-item active" onclick="showPage('todo',0)" id="nav-0" style="position:relative">
+    <div class="nav-icon">✅</div><div class="nav-label">To Do</div>
+  </div>
+  <div class="nav-item" onclick="showPage('anggaran',1)" id="nav-1">
+    <div class="nav-icon">💰</div><div class="nav-label">Anggaran</div>
+  </div>
+  <div class="nav-item" onclick="showPage('tamu',2)" id="nav-2">
+    <div class="nav-icon">👥</div><div class="nav-label">Tamu</div>
+  </div>
+</div>
+
+<!-- ════════ MODALS ════════ -->
+
+<!-- TODO MODAL -->
+<div class="modal-overlay" id="modal-todo">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-todo-title">Tambah Tugas</div>
+    <input type="hidden" id="todo-edit-id">
+    <div class="form-group">
+      <label class="form-label">Kegiatan</label>
+      <input class="form-input" id="f-todo-nama" placeholder="Nama tugas..." />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Deadline</label>
+        <input class="form-input" id="f-todo-deadline" placeholder="H-45" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">PIC</label>
+        <select class="form-select" id="f-todo-pic">
+          <option value="ayah">Ayah</option>
+          <option value="ibu">Ibu</option>
+          <option value="berdua">Berdua</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Progress: <span id="progress-display">0%</span></label>
+      <div class="range-wrap">
+        <input type="range" class="form-range" id="f-todo-progress" min="0" max="100" value="0" step="5"
+          oninput="document.getElementById('progress-display').textContent=this.value+'%'">
+        <span class="range-val" id="range-show">0%</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="f-todo-status">
+        <option value="belum">Belum</option>
+        <option value="proses">Proses</option>
+        <option value="selesai">Selesai</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('todo')">Batal</button>
+      <button class="btn-save" onclick="saveTodo()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANGGARAN MODAL -->
+<div class="modal-overlay" id="modal-anggaran">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-ang-title">Tambah Pos Anggaran</div>
+    <input type="hidden" id="ang-edit-id">
+    <div class="form-group">
+      <label class="form-label">Nama Pos</label>
+      <input class="form-input" id="f-ang-nama" placeholder="Contoh: Catering Prasmanan" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Anggaran (Rp)</label>
+        <input class="form-input" id="f-ang-anggaran" type="number" placeholder="0" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Realisasi (Rp)</label>
+        <input class="form-input" id="f-ang-realisasi" type="number" placeholder="0" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status Pembayaran</label>
+      <select class="form-select" id="f-ang-status">
+        <option value="belum">Belum bayar</option>
+        <option value="dp">DP Lunas</option>
+        <option value="lunas">Lunas</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Catatan (opsional)</label>
+      <input class="form-input" id="f-ang-catatan" placeholder="Nama vendor, no telp, dll..." />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('anggaran')">Batal</button>
+      <button class="btn-save" onclick="saveAnggaran()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TAMU MODAL -->
+<div class="modal-overlay" id="modal-tamu">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modal-tamu-title">Tambah Tamu</div>
+    <input type="hidden" id="tamu-edit-id">
+    <div class="form-group">
+      <label class="form-label">Nama Tamu / Keluarga</label>
+      <input class="form-input" id="f-tamu-nama" placeholder="Contoh: Keluarga Pak Budi" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Jumlah Orang</label>
+        <input class="form-input" id="f-tamu-jumlah" type="number" min="1" value="1" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Shift</label>
+        <select class="form-select" id="f-tamu-shift">
+          <option value="shift1">Shift 1 · 14.30</option>
+          <option value="shift2">Shift 2 · 17.00</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Jenis Tamu</label>
+        <select class="form-select" id="f-tamu-jenis">
+          <option value="keluarga">Keluarga</option>
+          <option value="teman">Teman</option>
+          <option value="kolega">Kolega</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Konfirmasi</label>
+        <select class="form-select" id="f-tamu-status">
+          <option value="belum">Belum konfirmasi</option>
+          <option value="hadir">Hadir</option>
+          <option value="tidak">Tidak hadir</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('tamu')">Batal</button>
+      <button class="btn-save" onclick="saveTamu()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp }
+  from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+// ── STATE ──
+let db = null, isFirebase = false;
+let todoFilter = { status: 'semua', pic: 'semua' };
+let angFilter = 'semua';
+let tamuFilter = { shift: 'semua', jenis: 'semua' };
+let todos = [], anggarans = [], tamus = [];
+let localId = 1;
+
+// ── FIREBASE CONNECT ──
+window.connectFirebase = async function() {
+  const apiKey = document.getElementById('cfg_apiKey').value.trim();
+  const projectId = document.getElementById('cfg_projectId').value.trim();
+  const appId = document.getElementById('cfg_appId').value.trim();
+  if (!apiKey || !projectId || !appId) { showToast('Lengkapi semua field config'); return; }
+  try {
+    const app = initializeApp({ apiKey, authDomain: projectId+'.firebaseapp.com', projectId, appId });
+    db = getFirestore(app);
+    isFirebase = true;
+    localStorage.setItem('khitan_cfg', JSON.stringify({ apiKey, projectId, appId }));
+    startApp();
+    listenFirebase();
+  } catch(e) { showToast('Gagal konek Firebase: ' + e.message); }
+}
+
+window.useLocalMode = function() {
+  const saved = localStorage.getItem('khitan_data');
+  if (saved) { const d = JSON.parse(saved); todos = d.todos||[]; anggarans = d.ang||[]; tamus = d.tamu||[]; }
+  startApp();
+  renderAll();
+}
+
+function saveLocal() {
+  localStorage.setItem('khitan_data', JSON.stringify({ todos, ang: anggarans, tamu: tamus }));
+}
+
+function listenFirebase() {
+  onSnapshot(collection(db,'todos'), snap => {
+    todos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTodo();
+  });
+  onSnapshot(collection(db,'anggaran'), snap => {
+    anggarans = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAnggaran();
+  });
+  onSnapshot(collection(db,'tamu'), snap => {
+    tamus = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderTamu();
+  });
+  document.getElementById('syncBadge').innerHTML = '<div class="sync-dot"></div> Online';
+  document.getElementById('syncBadge').className = 'sync-badge';
+}
+
+function startApp() {
+  document.getElementById('setupScreen').style.display = 'none';
+  document.getElementById('mainHeader').style.display = 'block';
+  document.getElementById('bottomNav').style.display = 'flex';
+  ['page-todo','page-anggaran','page-tamu'].forEach(p => document.getElementById(p).style.display = 'block');
+  document.getElementById('page-todo').classList.add('active');
+  document.getElementById('page-anggaran').classList.remove('active');
+  document.getElementById('page-tamu').classList.remove('active');
+}
+
+// Auto-reconnect
+window.addEventListener('load', () => {
+  const cfg = localStorage.getItem('khitan_cfg');
+  if (cfg) {
+    const { apiKey, projectId, appId } = JSON.parse(cfg);
+    document.getElementById('cfg_apiKey').value = apiKey;
+    document.getElementById('cfg_projectId').value = projectId;
+    document.getElementById('cfg_appId').value = appId;
+    window.connectFirebase();
+  }
+});
+
+// ── NAVIGATION ──
+window.showPage = function(name, idx) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.tab')[idx].classList.add('active');
+  document.getElementById('nav-'+idx).classList.add('active');
+}
+
+// ── MODAL ──
+window.openModal = function(type, id) {
+  if (id) {
+    if (type === 'todo') {
+      const item = todos.find(t => t.id == id);
+      document.getElementById('modal-todo-title').textContent = 'Edit Tugas';
+      document.getElementById('todo-edit-id').value = id;
+      document.getElementById('f-todo-nama').value = item.nama;
+      document.getElementById('f-todo-deadline').value = item.deadline;
+      document.getElementById('f-todo-pic').value = item.pic;
+      document.getElementById('f-todo-progress').value = item.progress;
+      document.getElementById('progress-display').textContent = item.progress + '%';
+      document.getElementById('range-show').textContent = item.progress + '%';
+      document.getElementById('f-todo-status').value = item.status;
+    } else if (type === 'anggaran') {
+      const item = anggarans.find(a => a.id == id);
+      document.getElementById('modal-ang-title').textContent = 'Edit Anggaran';
+      document.getElementById('ang-edit-id').value = id;
+      document.getElementById('f-ang-nama').value = item.nama;
+      document.getElementById('f-ang-anggaran').value = item.anggaran;
+      document.getElementById('f-ang-realisasi').value = item.realisasi;
+      document.getElementById('f-ang-status').value = item.status;
+      document.getElementById('f-ang-catatan').value = item.catatan||'';
+    } else if (type === 'tamu') {
+      const item = tamus.find(t => t.id == id);
+      document.getElementById('modal-tamu-title').textContent = 'Edit Tamu';
+      document.getElementById('tamu-edit-id').value = id;
+      document.getElementById('f-tamu-nama').value = item.nama;
+      document.getElementById('f-tamu-jumlah').value = item.jumlah;
+      document.getElementById('f-tamu-shift').value = item.shift;
+      document.getElementById('f-tamu-jenis').value = item.jenis;
+      document.getElementById('f-tamu-status').value = item.status;
+    }
+  } else {
+    if (type === 'todo') {
+      document.getElementById('modal-todo-title').textContent = 'Tambah Tugas';
+      document.getElementById('todo-edit-id').value = '';
+      document.getElementById('f-todo-nama').value = '';
+      document.getElementById('f-todo-deadline').value = '';
+      document.getElementById('f-todo-pic').value = 'ayah';
+      document.getElementById('f-todo-progress').value = 0;
+      document.getElementById('progress-display').textContent = '0%';
+      document.getElementById('range-show').textContent = '0%';
+      document.getElementById('f-todo-status').value = 'belum';
+    } else if (type === 'anggaran') {
+      document.getElementById('modal-ang-title').textContent = 'Tambah Pos Anggaran';
+      document.getElementById('ang-edit-id').value = '';
+      document.getElementById('f-ang-nama').value = '';
+      document.getElementById('f-ang-anggaran').value = '';
+      document.getElementById('f-ang-realisasi').value = '';
+      document.getElementById('f-ang-status').value = 'belum';
+      document.getElementById('f-ang-catatan').value = '';
+    } else if (type === 'tamu') {
+      document.getElementById('modal-tamu-title').textContent = 'Tambah Tamu';
+      document.getElementById('tamu-edit-id').value = '';
+      document.getElementById('f-tamu-nama').value = '';
+      document.getElementById('f-tamu-jumlah').value = 1;
+      document.getElementById('f-tamu-shift').value = 'shift1';
+      document.getElementById('f-tamu-jenis').value = 'keluarga';
+      document.getElementById('f-tamu-status').value = 'belum';
+    }
+  }
+  document.getElementById('modal-'+type).classList.add('open');
+}
+
+window.closeModal = function(type) {
+  document.getElementById('modal-'+type).classList.remove('open');
+}
+
+// close on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// range sync
+document.getElementById('f-todo-progress').addEventListener('input', function() {
+  document.getElementById('progress-display').textContent = this.value + '%';
+  document.getElementById('range-show').textContent = this.value + '%';
+});
+
+// ── CRUD TODO ──
+window.saveTodo = async function() {
+  const nama = document.getElementById('f-todo-nama').value.trim();
+  if (!nama) { showToast('Isi nama tugas dulu'); return; }
+  const data = {
+    nama,
+    deadline: document.getElementById('f-todo-deadline').value.trim(),
+    pic: document.getElementById('f-todo-pic').value,
+    progress: parseInt(document.getElementById('f-todo-progress').value),
+    status: document.getElementById('f-todo-status').value,
+    updated: Date.now()
+  };
+  const editId = document.getElementById('todo-edit-id').value;
+  if (isFirebase) {
+    if (editId) await updateDoc(doc(db,'todos',editId), data);
+    else await addDoc(collection(db,'todos'), { ...data, created: serverTimestamp() });
+  } else {
+    if (editId) { const i = todos.findIndex(t => t.id == editId); todos[i] = { id: editId, ...data }; }
+    else todos.push({ id: String(localId++), ...data });
+    saveLocal(); renderTodo();
+  }
+  closeModal('todo'); showToast(editId ? 'Tugas diperbarui ✓' : 'Tugas ditambahkan ✓');
+}
+
+window.deleteTodo = async function(id) {
+  if (!confirm('Hapus tugas ini?')) return;
+  if (isFirebase) await deleteDoc(doc(db,'todos',id));
+  else { todos = todos.filter(t => t.id != id); saveLocal(); renderTodo(); }
+  showToast('Tugas dihapus');
+}
+
+// ── CRUD ANGGARAN ──
+window.saveAnggaran = async function() {
+  const nama = document.getElementById('f-ang-nama').value.trim();
+  if (!nama) { showToast('Isi nama pos anggaran'); return; }
+  const data = {
+    nama,
+    anggaran: parseFloat(document.getElementById('f-ang-anggaran').value) || 0,
+    realisasi: parseFloat(document.getElementById('f-ang-realisasi').value) || 0,
+    status: document.getElementById('f-ang-status').value,
+    catatan: document.getElementById('f-ang-catatan').value.trim(),
+    updated: Date.now()
+  };
+  const editId = document.getElementById('ang-edit-id').value;
+  if (isFirebase) {
+    if (editId) await updateDoc(doc(db,'anggaran',editId), data);
+    else await addDoc(collection(db,'anggaran'), { ...data, created: serverTimestamp() });
+  } else {
+    if (editId) { const i = anggarans.findIndex(a => a.id == editId); anggarans[i] = { id: editId, ...data }; }
+    else anggarans.push({ id: String(localId++), ...data });
+    saveLocal(); renderAnggaran();
+  }
+  closeModal('anggaran'); showToast(editId ? 'Anggaran diperbarui ✓' : 'Pos ditambahkan ✓');
+}
+
+window.deleteAnggaran = async function(id) {
+  if (!confirm('Hapus pos ini?')) return;
+  if (isFirebase) await deleteDoc(doc(db,'anggaran',id));
+  else { anggarans = anggarans.filter(a => a.id != id); saveLocal(); renderAnggaran(); }
+  showToast('Pos dihapus');
+}
+
+// ── CRUD TAMU ──
+window.saveTamu = async function() {
+  const nama = document.getElementById('f-tamu-nama').value.trim();
+  if (!nama) { showToast('Isi nama tamu'); return; }
+  const data = {
+    nama,
+    jumlah: parseInt(document.getElementById('f-tamu-jumlah').value) || 1,
+    shift: document.getElementById('f-tamu-shift').value,
+    jenis: document.getElementById('f-tamu-jenis').value,
+    status: document.getElementById('f-tamu-status').value,
+    updated: Date.now()
+  };
+  const editId = document.getElementById('tamu-edit-id').value;
+  if (isFirebase) {
+    if (editId) await updateDoc(doc(db,'tamu',editId), data);
+    else await addDoc(collection(db,'tamu'), { ...data, created: serverTimestamp() });
+  } else {
+    if (editId) { const i = tamus.findIndex(t => t.id == editId); tamus[i] = { id: editId, ...data }; }
+    else tamus.push({ id: String(localId++), ...data });
+    saveLocal(); renderTamu();
+  }
+  closeModal('tamu'); showToast(editId ? 'Tamu diperbarui ✓' : 'Tamu ditambahkan ✓');
+}
+
+window.deleteTamu = async function(id) {
+  if (!confirm('Hapus tamu ini?')) return;
+  if (isFirebase) await deleteDoc(doc(db,'tamu',id));
+  else { tamus = tamus.filter(t => t.id != id); saveLocal(); renderTamu(); }
+  showToast('Tamu dihapus');
+}
+
+// ── FILTERS ──
+window.filterTodo = function(type, val, el) {
+  const group = type === 'status' ? 'fs-status' : 'fs-pic';
+  document.querySelectorAll('#'+group+' .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  todoFilter[type] = val;
+  renderTodo();
+}
+
+window.filterAng = function(val, el) {
+  document.querySelectorAll('#fa-status .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  angFilter = val;
+  renderAnggaran();
+}
+
+window.filterTamu = function(type, val, el) {
+  const group = type === 'shift' ? 'ft-shift' : 'ft-jenis';
+  document.querySelectorAll('#'+group+' .chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  tamuFilter[type] = val;
+  renderTamu();
+}
+
+// ── RENDER ──
+function rupiah(n) {
+  if (n >= 1000000) return 'Rp ' + (n/1000000).toFixed(1).replace('.0','') + ' jt';
+  return 'Rp ' + Number(n).toLocaleString('id');
+}
+
+function progressColor(p) {
+  if (p >= 100) return 'var(--green)';
+  if (p >= 50) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function statusBadge(s) {
+  const map = {
+    belum: ['b-red','Belum'], proses: ['b-amber','Proses'], selesai: ['b-green','Selesai']
+  };
+  const [cls, label] = map[s] || ['b-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function angStatusBadge(s) {
+  const map = { belum: ['b-gray','Belum bayar'], dp: ['b-amber','DP Lunas'], lunas: ['b-green','Lunas'] };
+  const [cls, label] = map[s] || ['b-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function tamuStatusBadge(s) {
+  const map = { belum: ['b-amber','Belum konfirmasi'], hadir: ['b-green','Hadir'], tidak: ['b-red','Tidak hadir'] };
+  const [cls, label] = map[s] || ['b-gray', s];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function jenisBadge(j) {
+  const map = { keluarga: 'b-purple', teman: 'b-gold', kolega: 'b-blue' };
+  return `<span class="badge ${map[j]||'b-gray'}">${j.charAt(0).toUpperCase()+j.slice(1)}</span>`;
+}
+
+function shiftBadge(s) {
+  return `<span class="badge b-blue">${s === 'shift1' ? 'Shift 1' : 'Shift 2'}</span>`;
+}
+
+function picBadge(p) {
+  const map = { ayah: 'b-blue', ibu: 'b-purple', berdua: 'b-gold' };
+  return `<span class="badge ${map[p]||'b-gray'}">${p.charAt(0).toUpperCase()+p.slice(1)}</span>`;
+}
+
+function renderTodo() {
+  const list = document.getElementById('todo-list');
+  const filtered = todos.filter(t => {
+    const ms = todoFilter.status === 'semua' || t.status === todoFilter.status;
+    const mp = todoFilter.pic === 'semua' || t.pic === todoFilter.pic;
+    return ms && mp;
+  });
+  document.getElementById('td-total').textContent = todos.length;
+  document.getElementById('td-selesai').textContent = todos.filter(t => t.status === 'selesai').length;
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">Belum ada tugas</div></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(t => `
+    <div class="todo-card">
+      <div class="todo-row1">
+        <div class="todo-name${t.status==='selesai'?' done':''}">${t.nama}</div>
+        ${statusBadge(t.status)}
+      </div>
+      <div class="todo-meta">
+        <div class="todo-field">Deadline: <b>${t.deadline||'—'}</b></div>
+        <div class="todo-field">PIC: ${picBadge(t.pic)}</div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-top"><span>Progress</span><span style="font-weight:600;color:${progressColor(t.progress)}">${t.progress}%</span></div>
+        <div class="progress-bg"><div class="progress-fill" style="width:${t.progress}%;background:${progressColor(t.progress)}"></div></div>
+      </div>
+      <div class="todo-actions">
+        <button class="btn-icon" onclick="openModal('todo','${t.id}')">✏️ Edit</button>
+        <button class="btn-icon danger" onclick="deleteTodo('${t.id}')">🗑 Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAnggaran() {
+  const list = document.getElementById('ang-list');
+  const filtered = anggarans.filter(a => angFilter === 'semua' || a.status === angFilter);
+  const totalAng = anggarans.reduce((s,a) => s + (a.anggaran||0), 0);
+  const totalReal = anggarans.reduce((s,a) => s + (a.realisasi||0), 0);
+  const pct = totalAng > 0 ? Math.round(totalReal/totalAng*100) : 0;
+  const sisa = totalAng - totalReal;
+  document.getElementById('ang-total').textContent = rupiah(totalAng);
+  document.getElementById('ang-real').textContent = rupiah(totalReal);
+  document.getElementById('ang-pct-label').textContent = pct + '% terpakai';
+  document.getElementById('ang-sisa-label').textContent = 'Sisa: ' + rupiah(sisa);
+  document.getElementById('ang-bar').style.width = Math.min(pct,100) + '%';
+  document.getElementById('ang-bar').style.background = pct > 90 ? 'var(--red)' : pct > 70 ? 'var(--amber)' : 'var(--accent)';
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">💰</div><div class="empty-text">Belum ada pos anggaran</div></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(a => {
+    const p = a.anggaran > 0 ? Math.round(a.realisasi/a.anggaran*100) : 0;
+    return `
+    <div class="ang-card">
+      <div class="ang-row1"><div class="ang-name">${a.nama}</div>${angStatusBadge(a.status)}</div>
+      <div class="ang-row2">
+        <div class="ang-field"><span class="todo-field" style="font-size:10px">Anggaran</span><b>${rupiah(a.anggaran)}</b></div>
+        <div class="ang-field"><span class="todo-field" style="font-size:10px">Realisasi</span><b>${a.realisasi > 0 ? rupiah(a.realisasi) : '—'}</b></div>
+      </div>
+      ${a.catatan ? `<div style="font-size:11px;color:var(--text-3);margin-top:4px">📝 ${a.catatan}</div>` : ''}
+      <div class="ang-progress-bg"><div class="ang-progress-fill" style="width:${Math.min(p,100)}%;background:${p>100?'var(--red)':'var(--accent)'}"></div></div>
+      <div class="ang-actions">
+        <button class="btn-icon" onclick="openModal('anggaran','${a.id}')">✏️ Edit</button>
+        <button class="btn-icon danger" onclick="deleteAnggaran('${a.id}')">🗑 Hapus</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTamu() {
+  const list = document.getElementById('tamu-list');
+  const filtered = tamus.filter(t => {
+    const ms = tamuFilter.shift === 'semua' || t.shift === tamuFilter.shift;
+    const mj = tamuFilter.jenis === 'semua' || t.jenis === tamuFilter.jenis;
+    return ms && mj;
+  });
+  document.getElementById('tm-total').textContent = tamus.length;
+  document.getElementById('tm-orang').textContent = tamus.reduce((s,t) => s + (t.jumlah||1), 0);
+  document.getElementById('tm-hadir').textContent = tamus.filter(t => t.status === 'hadir').length;
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Belum ada tamu</div></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(t => `
+    <div class="tamu-card">
+      <div class="tamu-row1"><div class="tamu-name">${t.nama}</div>${tamuStatusBadge(t.status)}</div>
+      <div class="tamu-row2">
+        <span class="tamu-meta">${t.jumlah} orang</span>
+        ${shiftBadge(t.shift)}
+        ${jenisBadge(t.jenis)}
+      </div>
+      <div class="tamu-actions">
+        <button class="btn-icon" onclick="openModal('tamu','${t.id}')">✏️ Edit</button>
+        <button class="btn-icon danger" onclick="deleteTamu('${t.id}')">🗑 Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAll() { renderTodo(); renderAnggaran(); renderTamu(); }
+
+// ── TOAST ──
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
