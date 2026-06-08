@@ -438,6 +438,8 @@ body {
     <div class="sum-card"><div class="sum-label">Selesai</div><div class="sum-val green" id="td-selesai">0</div></div>
   </div>
 
+  <button class="add-btn" onclick="openModal('todo')" style="margin-bottom:10px">＋ Tambah tugas</button>
+
   <div class="filter-section">
     <div class="filter-label">Filter status</div>
     <div class="chip-row" id="fs-status">
@@ -459,7 +461,6 @@ body {
   <div class="divider"></div>
 
   <div id="todo-list"></div>
-  <button class="add-btn" onclick="openModal('todo')">＋ Tambah tugas</button>
 </div>
 
 <!-- ════════ PAGE 2: ANGGARAN ════════ -->
@@ -476,6 +477,8 @@ body {
     <div class="budget-bar-bg"><div class="budget-bar-fill" id="ang-bar" style="width:0%"></div></div>
   </div>
 
+  <button class="add-btn" onclick="openModal('anggaran')" style="margin-bottom:10px">＋ Tambah pos anggaran</button>
+
   <div class="filter-section">
     <div class="filter-label">Filter status</div>
     <div class="chip-row" id="fa-status">
@@ -488,16 +491,21 @@ body {
   <div class="divider"></div>
 
   <div id="ang-list"></div>
-  <button class="add-btn" onclick="openModal('anggaran')">＋ Tambah pos anggaran</button>
 </div>
 
 <!-- ════════ PAGE 3: TAMU ════════ -->
 <div class="page" id="page-tamu" style="display:none">
-  <div class="counter-row">
+  <div class="counter-row" style="grid-template-columns:repeat(3,1fr)">
     <div class="counter-card"><div class="counter-num" id="tm-total">0</div><div class="counter-label">Total tamu</div></div>
-    <div class="counter-card"><div class="counter-num blue" id="tm-orang" style="color:var(--accent)">0</div><div class="counter-label">Total orang</div></div>
+    <div class="counter-card"><div class="counter-num" id="tm-orang" style="color:var(--accent)">0</div><div class="counter-label">Total orang</div></div>
     <div class="counter-card"><div class="counter-num" id="tm-hadir" style="color:var(--green)">0</div><div class="counter-label">Hadir</div></div>
   </div>
+  <div class="counter-row" style="grid-template-columns:repeat(2,1fr);margin-top:-4px">
+    <div class="counter-card"><div class="counter-num" id="tm-dewasa" style="color:var(--accent)">0</div><div class="counter-label">👨 Dewasa</div></div>
+    <div class="counter-card"><div class="counter-num" id="tm-anak" style="color:var(--purple)">0</div><div class="counter-label">👦 Anak-anak</div></div>
+  </div>
+
+  <button class="add-btn" onclick="openModal('tamu')" style="margin-bottom:10px">＋ Tambah tamu</button>
 
   <div class="filter-section">
     <div class="filter-label">Filter shift</div>
@@ -519,7 +527,6 @@ body {
   <div class="divider"></div>
 
   <div id="tamu-list"></div>
-  <button class="add-btn" onclick="openModal('tamu')">＋ Tambah tamu</button>
 </div>
 
 <!-- ════════ BOTTOM NAV ════════ -->
@@ -633,8 +640,22 @@ body {
       <label class="form-label">Nama Tamu / Keluarga</label>
       <input class="form-input" id="f-tamu-nama" placeholder="Contoh: Keluarga Pak Budi" />
     </div>
+    <div class="form-group">
+      <label class="form-label">Jumlah Orang</label>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;font-weight:500">👨 Dewasa</div>
+          <input class="form-input" id="f-tamu-dewasa" type="number" min="0" value="1" oninput="updateTotalTamu()" />
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--text-3);margin-bottom:4px;font-weight:500">👦 Anak-anak</div>
+          <input class="form-input" id="f-tamu-anak" type="number" min="0" value="0" oninput="updateTotalTamu()" />
+        </div>
+      </div>
+      <div style="margin-top:6px;padding:7px 10px;background:var(--accent-light);border-radius:var(--radius-sm);font-size:12px;color:var(--accent);font-weight:500" id="total-tamu-preview">Total: 1 orang</div>
+    </div>
     <div class="form-row">
-      <div class="form-group">
+      <div class="form-group" style="display:none">
         <label class="form-label">Jumlah Orang</label>
         <input class="form-input" id="f-tamu-jumlah" type="number" min="1" value="1" />
       </div>
@@ -833,7 +854,10 @@ window.openModal = function(type, id) {
       document.getElementById('modal-tamu-title').textContent = 'Edit Tamu';
       document.getElementById('tamu-edit-id').value = id;
       document.getElementById('f-tamu-nama').value = item.nama;
-      document.getElementById('f-tamu-jumlah').value = item.jumlah;
+      document.getElementById('f-tamu-dewasa').value = item.dewasa || 0;
+      document.getElementById('f-tamu-anak').value = item.anak || 0;
+      document.getElementById('f-tamu-jumlah').value = item.jumlah || 1;
+      document.getElementById('total-tamu-preview').textContent = 'Total: ' + ((item.dewasa||0)+(item.anak||0)) + ' orang';
       document.getElementById('f-tamu-shift').value = item.shift;
       document.getElementById('f-tamu-jenis').value = item.jenis;
       document.getElementById('f-tamu-status').value = item.status;
@@ -861,7 +885,10 @@ window.openModal = function(type, id) {
       document.getElementById('modal-tamu-title').textContent = 'Tambah Tamu';
       document.getElementById('tamu-edit-id').value = '';
       document.getElementById('f-tamu-nama').value = '';
+      document.getElementById('f-tamu-dewasa').value = 1;
+      document.getElementById('f-tamu-anak').value = 0;
       document.getElementById('f-tamu-jumlah').value = 1;
+      document.getElementById('total-tamu-preview').textContent = 'Total: 1 orang';
       document.getElementById('f-tamu-shift').value = 'shift1';
       document.getElementById('f-tamu-jenis').value = 'keluarga';
       document.getElementById('f-tamu-status').value = 'belum';
@@ -951,9 +978,13 @@ window.deleteAnggaran = async function(id) {
 window.saveTamu = async function() {
   const nama = document.getElementById('f-tamu-nama').value.trim();
   if (!nama) { showToast('Isi nama tamu'); return; }
+  const dewasa = parseInt(document.getElementById('f-tamu-dewasa').value) || 0;
+  const anak = parseInt(document.getElementById('f-tamu-anak').value) || 0;
   const data = {
     nama,
-    jumlah: parseInt(document.getElementById('f-tamu-jumlah').value) || 1,
+    dewasa,
+    anak,
+    jumlah: dewasa + anak,
     shift: document.getElementById('f-tamu-shift').value,
     jenis: document.getElementById('f-tamu-jenis').value,
     status: document.getElementById('f-tamu-status').value,
@@ -1127,8 +1158,10 @@ function renderTamu() {
     return ms && mj;
   });
   document.getElementById('tm-total').textContent = tamus.length;
-  document.getElementById('tm-orang').textContent = tamus.reduce((s,t) => s + (t.jumlah||1), 0);
+  document.getElementById('tm-orang').textContent = tamus.reduce((s,t) => s + (t.jumlah||((t.dewasa||0)+(t.anak||0))||1), 0);
   document.getElementById('tm-hadir').textContent = tamus.filter(t => t.status === 'hadir').length;
+  document.getElementById('tm-dewasa').textContent = tamus.reduce((s,t) => s + (t.dewasa||0), 0);
+  document.getElementById('tm-anak').textContent = tamus.reduce((s,t) => s + (t.anak||0), 0);
   if (!filtered.length) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Belum ada tamu</div></div>`;
     return;
@@ -1137,7 +1170,9 @@ function renderTamu() {
     <div class="tamu-card">
       <div class="tamu-row1"><div class="tamu-name">${t.nama}</div>${tamuStatusBadge(t.status)}</div>
       <div class="tamu-row2">
-        <span class="tamu-meta">${t.jumlah} orang</span>
+        <span class="tamu-meta">${t.jumlah||((t.dewasa||0)+(t.anak||0))} orang</span>
+        ${(t.dewasa||0)>0?`<span class="tamu-meta" style="color:var(--accent)">👨 ${t.dewasa} dewasa</span>`:''}
+        ${(t.anak||0)>0?`<span class="tamu-meta" style="color:var(--purple)">👦 ${t.anak} anak</span>`:''}
         ${shiftBadge(t.shift)}
         ${jenisBadge(t.jenis)}
       </div>
@@ -1249,7 +1284,7 @@ window.exportPage = function(type) {
       <tr>
         <td style="text-align:center">${i+1}</td>
         <td>${t.nama}</td>
-        <td style="text-align:center">${t.jumlah||1}</td>
+        <td style="text-align:center">${(t.dewasa||0)+(t.anak||0)||t.jumlah||1}<br><span style='font-size:9px;color:#888'>👨${t.dewasa||0} 👦${t.anak||0}</span></td>
         <td style="text-align:center">${t.shift==='shift1'?'Shift 1<br><span style=\'font-size:9px;color:#aaa\'>14.30–17.00</span>':'Shift 2<br><span style=\'font-size:9px;color:#aaa\'>17.00–21.00</span>'}</td>
         <td style="text-align:center"><span class="print-badge" style="background:${jenisColor[t.jenis]||'#eee;color:#666'}">${t.jenis||'—'}</span></td>
         <td style="text-align:center"><span class="print-badge" style="background:${stColor[t.status]||'#eee;color:#666'}">${stMap[t.status]||t.status}</span></td>
@@ -1309,6 +1344,13 @@ window.exportPage = function(type) {
     ${html}
   </body></html>`);
   win.document.close();
+}
+
+// ── UPDATE TOTAL TAMU PREVIEW ──
+window.updateTotalTamu = function() {
+  const d = parseInt(document.getElementById('f-tamu-dewasa').value) || 0;
+  const a = parseInt(document.getElementById('f-tamu-anak').value) || 0;
+  document.getElementById('total-tamu-preview').textContent = 'Total: ' + (d+a) + ' orang';
 }
 
 // ── TOAST ──
