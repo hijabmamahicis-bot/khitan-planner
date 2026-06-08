@@ -354,6 +354,26 @@ body {
   white-space: nowrap;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media print {
+  body { background: #fff !important; padding: 0 !important; max-width: 100% !important; }
+  .header, .bottom-nav, .modal-overlay, .toast, .add-btn, .todo-actions, .ang-actions, .tamu-actions, .chip-row, .filter-section, .filter-label { display: none !important; }
+  .page { display: block !important; padding: 0 !important; }
+  .print-page { page-break-after: always; padding: 20px; }
+  .print-header { border-bottom: 2px solid #1A3A5C; padding-bottom: 12px; margin-bottom: 16px; }
+  .print-title { font-size: 18px; font-weight: 600; color: #1A3A5C; }
+  .print-sub { font-size: 11px; color: #888; margin-top: 2px; }
+  .print-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 8px; }
+  .print-table th { background: #1A3A5C; color: #fff; padding: 7px 10px; text-align: left; font-weight: 500; }
+  .print-table td { padding: 6px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+  .print-table tr:nth-child(even) td { background: #f9f9f9; }
+  .print-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; }
+  .print-summary { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 14px; }
+  .print-sum-card { border: 1px solid #ddd; border-radius: 8px; padding: 10px 12px; }
+  .print-sum-label { font-size: 10px; color: #888; margin-bottom: 3px; }
+  .print-sum-val { font-size: 16px; font-weight: 600; color: #1A3A5C; }
+  .print-footer { margin-top: 20px; font-size: 10px; color: #aaa; border-top: 1px solid #eee; padding-top: 8px; text-align: right; }
+}
 </style>
 </head>
 <body>
@@ -399,7 +419,10 @@ body {
 <div class="header" id="mainHeader" style="display:none">
   <div class="header-top">
     <div class="app-name"><span>🏎️</span> Khitan Planner</div>
-    <div class="sync-badge" id="syncBadge"><div class="sync-dot"></div> Online</div>
+    <div style="display:flex;align-items:center;gap:6px">
+      <button onclick="openExportModal()" style="padding:4px 10px;border-radius:20px;border:1px solid var(--border-strong);background:transparent;font-size:11px;font-weight:500;color:var(--text-2);cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px">🖨️ Export</button>
+      <div class="sync-badge" id="syncBadge"><div class="sync-dot"></div> Online</div>
+    </div>
   </div>
   <div class="tabs" id="headerTabs">
     <div class="tab active" onclick="showPage('todo',0)"><span class="tab-icon">✅</span> To Do</div>
@@ -644,6 +667,43 @@ body {
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal('tamu')">Batal</button>
       <button class="btn-save" onclick="saveTamu()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🖨️ Export & Print Rekap</div>
+    <p style="font-size:13px;color:var(--text-2);margin-bottom:16px;line-height:1.6">Pilih halaman yang ingin dicetak. Setelah klik tombol, browser akan membuka dialog print — pilih <b>Save as PDF</b> atau langsung print.</p>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button onclick="exportPage('todo')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">✅</span>
+        <div>
+          <div style="font-weight:500;color:var(--text)">Rekap To Do List</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px">Semua tugas beserta deadline, PIC & progress</div>
+        </div>
+      </button>
+      <button onclick="exportPage('anggaran')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">💰</span>
+        <div>
+          <div style="font-weight:500;color:var(--text)">Rekap Anggaran Biaya</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px">Semua pos anggaran, realisasi & status bayar</div>
+        </div>
+      </button>
+      <button onclick="exportPage('tamu')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">👥</span>
+        <div>
+          <div style="font-weight:500;color:var(--text)">Rekap Daftar Tamu</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px">Semua tamu beserta shift, jenis & status konfirmasi</div>
+        </div>
+      </button>
+    </div>
+
+    <div style="margin-top:14px">
+      <button class="btn-cancel" onclick="closeModal('export')" style="width:100%">Tutup</button>
     </div>
   </div>
 </div>
@@ -1090,6 +1150,166 @@ function renderTamu() {
 }
 
 function renderAll() { renderTodo(); renderAnggaran(); renderTamu(); }
+
+// ── EXPORT / PRINT ──
+window.openExportModal = function() {
+  document.getElementById('modal-export').classList.add('open');
+}
+
+window.exportPage = function(type) {
+  closeModal('export');
+  const now = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
+
+  let html = '';
+
+  if (type === 'todo') {
+    const statusMap = { belum:'Belum', proses:'Proses', selesai:'Selesai' };
+    const statusColor = { belum:'#fdecea;color:#c0392b', proses:'#fdf3dc;color:#b7770d', selesai:'#e8f6ee;color:#1a6b3c' };
+    const picColor = { ayah:'#e6f1fb;color:#185fa5', ibu:'#eeeafc;color:#4a3580', berdua:'#fdf6e3;color:#b8860b' };
+    const rows = todos.map((t,i) => `
+      <tr>
+        <td style="text-align:center">${i+1}</td>
+        <td>${t.nama}</td>
+        <td style="text-align:center">${t.deadline||'—'}</td>
+        <td style="text-align:center"><span class="print-badge" style="background:${picColor[t.pic]||'#eee;color:#666'}">${t.pic||'—'}</span></td>
+        <td style="text-align:center">${t.progress||0}%</td>
+        <td style="text-align:center"><span class="print-badge" style="background:${statusColor[t.status]||'#eee;color:#666'}">${statusMap[t.status]||t.status}</span></td>
+      </tr>`).join('');
+    const selesai = todos.filter(t=>t.status==='selesai').length;
+    const proses = todos.filter(t=>t.status==='proses').length;
+    const belum = todos.filter(t=>t.status==='belum').length;
+    html = `
+      <div class="print-page">
+        <div class="print-header">
+          <div class="print-title">✅ Rekap To Do List — Acara Khitan</div>
+          <div class="print-sub">Dicetak: ${now} &nbsp;|&nbsp; Total: ${todos.length} tugas</div>
+        </div>
+        <div class="print-summary">
+          <div class="print-sum-card"><div class="print-sum-label">Total Tugas</div><div class="print-sum-val">${todos.length}</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Selesai</div><div class="print-sum-val" style="color:#1a6b3c">${selesai}</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Belum / Proses</div><div class="print-sum-val" style="color:#b7770d">${belum+proses}</div></div>
+        </div>
+        <table class="print-table">
+          <thead><tr><th style="width:30px">No</th><th>Kegiatan</th><th style="width:70px">Deadline</th><th style="width:70px">PIC</th><th style="width:60px">Progress</th><th style="width:80px">Status</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">Belum ada data</td></tr>'}</tbody>
+        </table>
+        <div class="print-footer">🏎️ Khitan Planner — khitan-planner.html</div>
+      </div>`;
+
+  } else if (type === 'anggaran') {
+    const stMap = { belum:'Belum Bayar', dp:'DP Lunas', lunas:'Lunas' };
+    const stColor = { belum:'#f2f2f2;color:#888', dp:'#fdf3dc;color:#b7770d', lunas:'#e8f6ee;color:#1a6b3c' };
+    const totalAng = anggarans.reduce((s,a)=>s+(a.anggaran||0),0);
+    const totalReal = anggarans.reduce((s,a)=>s+(a.realisasi||0),0);
+    const sisa = totalAng - totalReal;
+    const pct = totalAng>0?Math.round(totalReal/totalAng*100):0;
+    const rows = anggarans.map((a,i) => `
+      <tr>
+        <td style="text-align:center">${i+1}</td>
+        <td>${a.nama}${a.catatan?'<br><span style="font-size:10px;color:#aaa">'+a.catatan+'</span>':''}</td>
+        <td style="text-align:right">Rp ${Number(a.anggaran||0).toLocaleString('id')}</td>
+        <td style="text-align:right">${a.realisasi>0?'Rp '+Number(a.realisasi).toLocaleString('id'):'—'}</td>
+        <td style="text-align:right">${a.anggaran>0?'Rp '+Number(a.anggaran-(a.realisasi||0)).toLocaleString('id'):'—'}</td>
+        <td style="text-align:center"><span class="print-badge" style="background:${stColor[a.status]||'#eee;color:#666'}">${stMap[a.status]||a.status}</span></td>
+      </tr>`).join('');
+    html = `
+      <div class="print-page">
+        <div class="print-header">
+          <div class="print-title">💰 Rekap Anggaran Biaya — Acara Khitan</div>
+          <div class="print-sub">Dicetak: ${now} &nbsp;|&nbsp; ${anggarans.length} pos anggaran</div>
+        </div>
+        <div class="print-summary">
+          <div class="print-sum-card"><div class="print-sum-label">Total Anggaran</div><div class="print-sum-val" style="font-size:13px">Rp ${Number(totalAng).toLocaleString('id')}</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Total Realisasi</div><div class="print-sum-val" style="font-size:13px;color:#1a6b3c">Rp ${Number(totalReal).toLocaleString('id')}</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Sisa (${pct}% terpakai)</div><div class="print-sum-val" style="font-size:13px;color:#b7770d">Rp ${Number(sisa).toLocaleString('id')}</div></div>
+        </div>
+        <table class="print-table">
+          <thead><tr><th style="width:30px">No</th><th>Nama Pos</th><th style="width:110px">Anggaran (Rp)</th><th style="width:110px">Realisasi (Rp)</th><th style="width:110px">Sisa (Rp)</th><th style="width:90px">Status</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">Belum ada data</td></tr>'}
+          <tr style="font-weight:600;background:#f0f4fa">
+            <td colspan="2" style="text-align:right;padding:8px 10px">TOTAL</td>
+            <td style="text-align:right">Rp ${Number(totalAng).toLocaleString('id')}</td>
+            <td style="text-align:right">Rp ${Number(totalReal).toLocaleString('id')}</td>
+            <td style="text-align:right">Rp ${Number(sisa).toLocaleString('id')}</td>
+            <td></td>
+          </tr></tbody>
+        </table>
+        <div class="print-footer">🏎️ Khitan Planner — khitan-planner.html</div>
+      </div>`;
+
+  } else if (type === 'tamu') {
+    const stMap = { belum:'Belum Konfirmasi', hadir:'Hadir', tidak:'Tidak Hadir' };
+    const stColor = { belum:'#fdf3dc;color:#b7770d', hadir:'#e8f6ee;color:#1a6b3c', tidak:'#fdecea;color:#c0392b' };
+    const jenisColor = { keluarga:'#eeeafc;color:#4a3580', teman:'#fdf6e3;color:#b8860b', kolega:'#e6f1fb;color:#185fa5' };
+    const totalOrang = tamus.reduce((s,t)=>s+(t.jumlah||1),0);
+    const hadir = tamus.filter(t=>t.status==='hadir').length;
+    const shift1 = tamus.filter(t=>t.shift==='shift1').length;
+    const shift2 = tamus.filter(t=>t.shift==='shift2').length;
+    const rows = tamus.map((t,i) => `
+      <tr>
+        <td style="text-align:center">${i+1}</td>
+        <td>${t.nama}</td>
+        <td style="text-align:center">${t.jumlah||1}</td>
+        <td style="text-align:center">${t.shift==='shift1'?'Shift 1<br><span style=\'font-size:9px;color:#aaa\'>14.30–17.00</span>':'Shift 2<br><span style=\'font-size:9px;color:#aaa\'>17.00–21.00</span>'}</td>
+        <td style="text-align:center"><span class="print-badge" style="background:${jenisColor[t.jenis]||'#eee;color:#666'}">${t.jenis||'—'}</span></td>
+        <td style="text-align:center"><span class="print-badge" style="background:${stColor[t.status]||'#eee;color:#666'}">${stMap[t.status]||t.status}</span></td>
+      </tr>`).join('');
+    html = `
+      <div class="print-page">
+        <div class="print-header">
+          <div class="print-title">👥 Rekap Daftar Tamu — Acara Khitan</div>
+          <div class="print-sub">Dicetak: ${now} &nbsp;|&nbsp; ${tamus.length} tamu terdaftar</div>
+        </div>
+        <div class="print-summary">
+          <div class="print-sum-card"><div class="print-sum-label">Total Tamu</div><div class="print-sum-val">${tamus.length}</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Total Orang</div><div class="print-sum-val" style="color:#185fa5">${totalOrang}</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Konfirmasi Hadir</div><div class="print-sum-val" style="color:#1a6b3c">${hadir}</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <div class="print-sum-card"><div class="print-sum-label">Shift 1 (14.30–17.00)</div><div class="print-sum-val" style="font-size:14px">${shift1} tamu</div></div>
+          <div class="print-sum-card"><div class="print-sum-label">Shift 2 (17.00–21.00)</div><div class="print-sum-val" style="font-size:14px">${shift2} tamu</div></div>
+        </div>
+        <table class="print-table">
+          <thead><tr><th style="width:30px">No</th><th>Nama Tamu</th><th style="width:50px">Jml</th><th style="width:80px">Shift</th><th style="width:70px">Jenis</th><th style="width:110px">Status</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">Belum ada data</td></tr>'}</tbody>
+        </table>
+        <div class="print-footer">🏎️ Khitan Planner — khitan-planner.html</div>
+      </div>`;
+  }
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <meta charset="UTF-8">
+    <title>Rekap Khitan Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:'DM Sans',sans-serif;padding:20px;color:#1a1814;background:#fff;font-size:12px}
+      .print-page{max-width:900px;margin:0 auto}
+      .print-header{border-bottom:2px solid #1A3A5C;padding-bottom:12px;margin-bottom:16px}
+      .print-title{font-size:18px;font-weight:600;color:#1A3A5C}
+      .print-sub{font-size:11px;color:#888;margin-top:3px}
+      .print-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px}
+      .print-table th{background:#1A3A5C;color:#fff;padding:8px 10px;text-align:left;font-weight:500}
+      .print-table td{padding:7px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+      .print-table tr:nth-child(even) td{background:#f9f9f9}
+      .print-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+      .print-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+      .print-sum-card{border:1px solid #ddd;border-radius:8px;padding:10px 14px}
+      .print-sum-label{font-size:10px;color:#888;margin-bottom:4px}
+      .print-sum-val{font-size:18px;font-weight:600;color:#1A3A5C}
+      .print-footer{margin-top:20px;font-size:10px;color:#aaa;border-top:1px solid #eee;padding-top:8px;text-align:right}
+      @media print{body{padding:10px}.no-print{display:none}}
+    </style>
+  </head><body>
+    <div class="no-print" style="background:#1A3A5C;color:#fff;padding:10px 16px;border-radius:8px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;font-size:13px">
+      <span>🖨️ Siap dicetak — Klik tombol Print atau tekan Ctrl+P</span>
+      <button onclick="window.print()" style="background:#fff;color:#1A3A5C;border:none;padding:6px 16px;border-radius:6px;font-weight:600;cursor:pointer;font-size:13px">Print / Save PDF</button>
+    </div>
+    ${html}
+  </body></html>`);
+  win.document.close();
+}
 
 // ── TOAST ──
 window.showToast = function(msg) {
