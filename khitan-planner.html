@@ -732,10 +732,15 @@ window.addEventListener('load', () => {
 
 // ── NAVIGATION ──
 window.showPage = function(name, idx) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = 'none';
+  });
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
+  var target = document.getElementById('page-'+name);
+  target.classList.add('active');
+  target.style.display = 'block';
   document.querySelectorAll('.tab')[idx].classList.add('active');
   document.getElementById('nav-'+idx).classList.add('active');
 }
