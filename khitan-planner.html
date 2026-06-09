@@ -495,15 +495,12 @@ body {
 
 <!-- ════════ PAGE 3: TAMU ════════ -->
 <div class="page" id="page-tamu" style="display:none">
-  <div class="counter-row" style="grid-template-columns:repeat(3,1fr)">
-    <div class="counter-card"><div class="counter-num" id="tm-total">0</div><div class="counter-label">Total tamu</div></div>
-    <div class="counter-card"><div class="counter-num" id="tm-orang" style="color:var(--accent)">0</div><div class="counter-label">Total orang</div></div>
-    <div class="counter-card"><div class="counter-num" id="tm-hadir" style="color:var(--green)">0</div><div class="counter-label">Hadir</div></div>
-  </div>
-  <div class="counter-row" style="grid-template-columns:repeat(2,1fr);margin-top:-4px">
-    <div class="counter-card"><div class="counter-num" id="tm-dewasa" style="color:var(--accent)">0</div><div class="counter-label">👨 Dewasa</div></div>
-    <div class="counter-card"><div class="counter-num" id="tm-anak" style="color:var(--purple)">0</div><div class="counter-label">👦 Anak-anak</div></div>
-  </div>
+  <!-- hidden counters for JS — tidak ditampilkan -->
+  <span id="tm-total" style="display:none">0</span>
+  <span id="tm-orang" style="display:none">0</span>
+  <span id="tm-hadir" style="display:none">0</span>
+  <span id="tm-dewasa" style="display:none">0</span>
+  <span id="tm-anak" style="display:none">0</span>
 
   <button class="add-btn" onclick="openModal('tamu')" style="margin-bottom:10px">＋ Tambah tamu</button>
 
