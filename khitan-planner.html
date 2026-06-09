@@ -507,6 +507,36 @@ body {
 
   <button class="add-btn" onclick="openModal('tamu')" style="margin-bottom:10px">＋ Tambah tamu</button>
 
+  <!-- STATS DINAMIS -->
+  <div id="tamu-stats-box" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" id="stats-title">Semua Shift</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
+      <div style="text-align:center">
+        <div style="font-size:18px;font-weight:600;color:var(--text)" id="stats-tamu">0</div>
+        <div style="font-size:10px;color:var(--text-3)">Tamu</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:18px;font-weight:600;color:var(--accent)" id="stats-orang">0</div>
+        <div style="font-size:10px;color:var(--text-3)">Total Orang</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:18px;font-weight:600;color:var(--green)" id="stats-hadir">0</div>
+        <div style="font-size:10px;color:var(--text-3)">Hadir</div>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--border);margin:6px 0"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div style="background:var(--bg);border-radius:8px;padding:7px 10px;text-align:center">
+        <div style="font-size:15px;font-weight:600;color:var(--accent)" id="stats-dewasa">0</div>
+        <div style="font-size:10px;color:var(--text-3)">👨 Dewasa</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:7px 10px;text-align:center">
+        <div style="font-size:15px;font-weight:600;color:var(--purple)" id="stats-anak">0</div>
+        <div style="font-size:10px;color:var(--text-3)">👦 Anak-anak</div>
+      </div>
+    </div>
+  </div>
+
   <div class="filter-section">
     <div class="filter-label">Filter shift</div>
     <div class="chip-row" id="ft-shift">
@@ -1157,11 +1187,29 @@ function renderTamu() {
     const mj = tamuFilter.jenis === 'semua' || t.jenis === tamuFilter.jenis;
     return ms && mj;
   });
+  // ── Counter atas (selalu semua data) ──
   document.getElementById('tm-total').textContent = tamus.length;
   document.getElementById('tm-orang').textContent = tamus.reduce((s,t) => s + (t.jumlah||((t.dewasa||0)+(t.anak||0))||1), 0);
   document.getElementById('tm-hadir').textContent = tamus.filter(t => t.status === 'hadir').length;
   document.getElementById('tm-dewasa').textContent = tamus.reduce((s,t) => s + (t.dewasa||0), 0);
   document.getElementById('tm-anak').textContent = tamus.reduce((s,t) => s + (t.anak||0), 0);
+
+  // ── Stats box dinamis sesuai filter aktif ──
+  const statsData = filtered;
+  const statsShift = tamuFilter.shift;
+  const statsJenis = tamuFilter.jenis;
+
+  let statsTitle = 'Semua Shift';
+  if (statsShift === 'shift1') statsTitle = 'Shift 1 · 14.30–17.00';
+  else if (statsShift === 'shift2') statsTitle = 'Shift 2 · 17.00–21.00';
+  if (statsJenis !== 'semua') statsTitle += ' · ' + statsJenis.charAt(0).toUpperCase() + statsJenis.slice(1);
+
+  document.getElementById('stats-title').textContent = statsTitle;
+  document.getElementById('stats-tamu').textContent = statsData.length;
+  document.getElementById('stats-orang').textContent = statsData.reduce((s,t) => s + (t.jumlah||((t.dewasa||0)+(t.anak||0))||1), 0);
+  document.getElementById('stats-hadir').textContent = statsData.filter(t => t.status === 'hadir').length;
+  document.getElementById('stats-dewasa').textContent = statsData.reduce((s,t) => s + (t.dewasa||0), 0);
+  document.getElementById('stats-anak').textContent = statsData.reduce((s,t) => s + (t.anak||0), 0);
   if (!filtered.length) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">Belum ada tamu</div></div>`;
     return;
