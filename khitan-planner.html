@@ -86,56 +86,7 @@ body {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ── SETUP SCREEN ── */
-.setup-screen {
-  position: fixed; inset: 0; background: var(--bg);
-  z-index: 999; display: flex; align-items: center; justify-content: center;
-  padding: 24px;
-}
-.setup-card {
-  background: var(--surface); border-radius: var(--radius);
-  padding: 28px 24px; width: 100%; max-width: 400px;
-  box-shadow: var(--shadow); border: 1px solid var(--border);
-}
-.setup-title {
-  font-family: 'DM Serif Display', serif;
-  font-size: 22px; margin-bottom: 6px; color: var(--text);
-}
-.setup-sub { font-size: 13px; color: var(--text-2); margin-bottom: 20px; line-height: 1.6; }
-.setup-step {
-  background: var(--bg); border-radius: var(--radius-sm);
-  padding: 12px 14px; margin-bottom: 8px;
-  font-size: 12px; color: var(--text-2); line-height: 1.7;
-  border: 1px solid var(--border);
-}
-.setup-step strong { color: var(--text); display: block; font-size: 13px; margin-bottom: 2px; }
-.setup-step code {
-  background: var(--accent-light); color: var(--accent);
-  padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;
-}
-.input-group { margin-bottom: 10px; }
-.input-label { font-size: 11px; font-weight: 600; color: var(--text-2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px; }
-.input-field {
-  width: 100%; padding: 10px 12px; border: 1px solid var(--border);
-  border-radius: var(--radius-sm); font-size: 13px; background: var(--bg);
-  color: var(--text); font-family: 'DM Sans', sans-serif;
-  transition: border-color .2s;
-}
-.input-field:focus { outline: none; border-color: var(--accent); }
-.btn-primary {
-  width: 100%; padding: 12px; background: var(--accent);
-  color: #fff; border: none; border-radius: var(--radius-sm);
-  font-size: 14px; font-weight: 500; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; margin-top: 6px;
-  transition: opacity .2s;
-}
-.btn-primary:hover { opacity: .9; }
-.btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-.btn-link {
-  width: 100%; padding: 10px; background: transparent;
-  color: var(--text-2); border: 1px solid var(--border);
-  border-radius: var(--radius-sm); font-size: 13px;
-  cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 6px;
-}
+/* setup screen dihapus - config sudah ditanam */
 
 /* ── SUMMARY CARDS ── */
 .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
@@ -378,42 +329,7 @@ body {
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
-<div class="setup-screen" id="setupScreen">
-  <div class="setup-card">
-    <div class="setup-title">🏎️ Khitan Planner</div>
-    <div class="setup-sub">Sambungkan ke Firebase agar data Anda & istri sinkron real-time dari HP masing-masing.</div>
-
-    <div class="setup-step">
-      <strong>Langkah 1 — Buat project Firebase</strong>
-      Buka <code>console.firebase.google.com</code> → klik <code>Add project</code> → beri nama (misal: <code>khitan-planner</code>)
-    </div>
-    <div class="setup-step">
-      <strong>Langkah 2 — Aktifkan Firestore</strong>
-      Di sidebar klik <code>Firestore Database</code> → <code>Create database</code> → pilih <code>Start in test mode</code>
-    </div>
-    <div class="setup-step">
-      <strong>Langkah 3 — Ambil config</strong>
-      Klik ⚙️ <code>Project settings</code> → scroll ke <code>Your apps</code> → klik <code>&lt;/&gt;</code> (Web) → copy nilai dari <code>firebaseConfig</code>
-    </div>
-
-    <div class="input-group">
-      <div class="input-label">API Key</div>
-      <input class="input-field" id="cfg_apiKey" placeholder="AIzaSy..." />
-    </div>
-    <div class="input-group">
-      <div class="input-label">Project ID</div>
-      <input class="input-field" id="cfg_projectId" placeholder="khitan-planner" />
-    </div>
-    <div class="input-group">
-      <div class="input-label">App ID</div>
-      <input class="input-field" id="cfg_appId" placeholder="1:123456:web:abc123" />
-    </div>
-
-    <button class="btn-primary" onclick="connectFirebase()">🔗 Sambungkan & Mulai</button>
-    <button class="btn-link" onclick="useLocalMode()">Coba dulu tanpa Firebase (data lokal)</button>
-  </div>
-</div>
+<!-- Config Firebase sudah ditanam langsung -->
 
 <!-- HEADER -->
 <div class="header" id="mainHeader" style="display:none">
@@ -772,28 +688,13 @@ let tamuFilter = { shift: 'semua', jenis: 'semua' };
 let todos = [], anggarans = [], tamus = [];
 let localId = 1;
 
-// ── FIREBASE CONNECT ──
-window.connectFirebase = async function() {
-  const apiKey = document.getElementById('cfg_apiKey').value.trim();
-  const projectId = document.getElementById('cfg_projectId').value.trim();
-  const appId = document.getElementById('cfg_appId').value.trim();
-  if (!apiKey || !projectId || !appId) { showToast('Lengkapi semua field config'); return; }
-  try {
-    const app = initializeApp({ apiKey, authDomain: projectId+'.firebaseapp.com', projectId, appId });
-    db = getFirestore(app);
-    isFirebase = true;
-    localStorage.setItem('khitan_cfg', JSON.stringify({ apiKey, projectId, appId }));
-    startApp();
-    listenFirebase();
-  } catch(e) { showToast('Gagal konek Firebase: ' + e.message); }
-}
-
-window.useLocalMode = function() {
-  const saved = localStorage.getItem('khitan_data');
-  if (saved) { const d = JSON.parse(saved); todos = d.todos||[]; anggarans = d.ang||[]; tamus = d.tamu||[]; }
-  startApp();
-  renderAll();
-}
+// ── FIREBASE CONFIG — sudah ditanam langsung ──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCCj6xzxujEPTQ236--XE_DXQ4kGsGESE4",
+  authDomain: "khitan-planner.firebaseapp.com",
+  projectId: "khitan-planner",
+  appId: "1:883281959274:web:82d86fbb3ef7855ce92d13"
+};
 
 function saveLocal() {
   localStorage.setItem('khitan_data', JSON.stringify({ todos, ang: anggarans, tamu: tamus }));
@@ -817,7 +718,6 @@ function listenFirebase() {
 }
 
 function startApp() {
-  document.getElementById('setupScreen').style.display = 'none';
   document.getElementById('mainHeader').style.display = 'block';
   document.getElementById('bottomNav').style.display = 'flex';
   ['page-todo','page-anggaran','page-tamu'].forEach(p => document.getElementById(p).style.display = 'block');
@@ -826,15 +726,23 @@ function startApp() {
   document.getElementById('page-tamu').classList.remove('active');
 }
 
-// Auto-reconnect
-window.addEventListener('load', () => {
-  const cfg = localStorage.getItem('khitan_cfg');
-  if (cfg) {
-    const { apiKey, projectId, appId } = JSON.parse(cfg);
-    document.getElementById('cfg_apiKey').value = apiKey;
-    document.getElementById('cfg_projectId').value = projectId;
-    document.getElementById('cfg_appId').value = appId;
-    window.connectFirebase();
+// ── AUTO INIT saat halaman dibuka ──
+window.addEventListener('load', async () => {
+  try {
+    const app = initializeApp(FIREBASE_CONFIG);
+    db = getFirestore(app);
+    isFirebase = true;
+    startApp();
+    listenFirebase();
+  } catch(e) {
+    // fallback local
+    const saved = localStorage.getItem('khitan_data');
+    if (saved) { const d = JSON.parse(saved); todos = d.todos||[]; anggarans = d.ang||[]; tamus = d.tamu||[]; }
+    startApp();
+    renderAll();
+    document.getElementById('syncBadge').innerHTML = '<div class="sync-dot" style="background:var(--amber)"></div> Offline';
+    document.getElementById('syncBadge').className = 'sync-badge offline';
+    showToast('Mode offline — data tersimpan lokal');
   }
 });
 
