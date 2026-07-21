@@ -395,6 +395,31 @@ body {
 
   <button class="add-btn" onclick="openModal('anggaran')" style="margin-bottom:10px">＋ Tambah pos anggaran</button>
 
+  <div id="ang-status-box" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Nilai per status</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--green-light);border-radius:var(--radius-sm);margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span class="badge b-green">Lunas</span>
+        <span style="font-size:11px;color:var(--text-3)" id="ang-lunas-count">0 pos</span>
+      </div>
+      <span style="font-size:13px;font-weight:500;color:var(--green)" id="ang-lunas-val">Rp 0</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--amber-light);border-radius:var(--radius-sm);margin-bottom:6px">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span class="badge b-amber">DP Lunas</span>
+        <span style="font-size:11px;color:var(--text-3)" id="ang-dp-count">0 pos</span>
+      </div>
+      <span style="font-size:13px;font-weight:500;color:var(--amber)" id="ang-dp-val">Rp 0</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg);border-radius:var(--radius-sm);border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span class="badge b-gray">Belum bayar</span>
+        <span style="font-size:11px;color:var(--text-3)" id="ang-belum-count">0 pos</span>
+      </div>
+      <span style="font-size:13px;font-weight:500;color:var(--text-2)" id="ang-belum-val">Rp 0</span>
+    </div>
+  </div>
+
   <div class="filter-section">
     <div class="filter-label">Filter status</div>
     <div class="chip-row" id="fa-status">
@@ -650,11 +675,32 @@ body {
           <div style="font-size:11px;color:var(--text-3);margin-top:1px">Semua tugas beserta deadline, PIC & progress</div>
         </div>
       </button>
-      <button onclick="exportPage('anggaran')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px">💰</span>
+      <button onclick="exportPage('anggaran','semua')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">📋</span>
         <div>
-          <div style="font-weight:500;color:var(--text)">Rekap Anggaran Biaya</div>
-          <div style="font-size:11px;color:var(--text-3);margin-top:1px">Semua pos anggaran, realisasi & status bayar</div>
+          <div style="font-weight:500;color:var(--text)">Rekap Anggaran — Semua pos</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px">Seluruh anggaran dalam 1 rekap lengkap</div>
+        </div>
+      </button>
+      <button onclick="exportPage('anggaran','lunas')" style="padding:13px 16px;border:1px solid var(--green);border-radius:var(--radius-sm);background:var(--green-light);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">✅</span>
+        <div>
+          <div style="font-weight:500;color:var(--green)">Rekap Anggaran — Lunas saja</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px" id="exp-lunas-info">— pos</div>
+        </div>
+      </button>
+      <button onclick="exportPage('anggaran','dp')" style="padding:13px 16px;border:1px solid var(--gold);border-radius:var(--radius-sm);background:var(--amber-light);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">⏳</span>
+        <div>
+          <div style="font-weight:500;color:var(--amber)">Rekap Anggaran — DP Lunas saja</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px" id="exp-dp-info">— pos</div>
+        </div>
+      </button>
+      <button onclick="exportPage('anggaran','belum')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🔲</span>
+        <div>
+          <div style="font-weight:500;color:var(--text)">Rekap Anggaran — Belum bayar saja</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px" id="exp-belum-info">— pos</div>
         </div>
       </button>
       <button onclick="exportPage('tamu')" style="padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);text-align:left;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;display:flex;align-items:center;gap:10px">
@@ -1062,6 +1108,20 @@ function renderAnggaran() {
   document.getElementById('ang-sisa-label').textContent = 'Sisa: ' + rupiah(sisa);
   document.getElementById('ang-bar').style.width = Math.min(pct,100) + '%';
   document.getElementById('ang-bar').style.background = pct > 90 ? 'var(--red)' : pct > 70 ? 'var(--amber)' : 'var(--accent)';
+
+  // ── Nilai per status ──
+  const lunasItems = anggarans.filter(a => a.status === 'lunas');
+  const dpItems = anggarans.filter(a => a.status === 'dp');
+  const belumItems = anggarans.filter(a => a.status === 'belum');
+  const lunasVal = lunasItems.reduce((s,a) => s + (a.anggaran||0), 0);
+  const dpVal = dpItems.reduce((s,a) => s + (a.anggaran||0), 0);
+  const belumVal = belumItems.reduce((s,a) => s + (a.anggaran||0), 0);
+  document.getElementById('ang-lunas-count').textContent = lunasItems.length + ' pos';
+  document.getElementById('ang-dp-count').textContent = dpItems.length + ' pos';
+  document.getElementById('ang-belum-count').textContent = belumItems.length + ' pos';
+  document.getElementById('ang-lunas-val').textContent = rupiah(lunasVal);
+  document.getElementById('ang-dp-val').textContent = rupiah(dpVal);
+  document.getElementById('ang-belum-val').textContent = rupiah(belumVal);
   if (!filtered.length) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">💰</div><div class="empty-text">Belum ada pos anggaran</div></div>`;
     return;
@@ -1141,10 +1201,19 @@ function renderAll() { renderTodo(); renderAnggaran(); renderTamu(); }
 
 // ── EXPORT / PRINT ──
 window.openExportModal = function() {
+  const lunas = anggarans.filter(a => a.status === 'lunas');
+  const dp = anggarans.filter(a => a.status === 'dp');
+  const belum = anggarans.filter(a => a.status === 'belum');
+  const lunasVal = lunas.reduce((s,a) => s+(a.anggaran||0), 0);
+  const dpVal = dp.reduce((s,a) => s+(a.anggaran||0), 0);
+  const belumVal = belum.reduce((s,a) => s+(a.anggaran||0), 0);
+  document.getElementById('exp-lunas-info').textContent = lunas.length + ' pos · ' + rupiah(lunasVal);
+  document.getElementById('exp-dp-info').textContent = dp.length + ' pos · ' + rupiah(dpVal);
+  document.getElementById('exp-belum-info').textContent = belum.length + ' pos · ' + rupiah(belumVal);
   document.getElementById('modal-export').classList.add('open');
 }
 
-window.exportPage = function(type) {
+window.exportPage = function(type, subtype) {
   closeModal('export');
   const now = new Date().toLocaleDateString('id-ID', { day:'2-digit', month:'long', year:'numeric' });
 
@@ -1185,13 +1254,16 @@ window.exportPage = function(type) {
       </div>`;
 
   } else if (type === 'anggaran') {
+    const statusFilter = subtype || 'semua';
     const stMap = { belum:'Belum Bayar', dp:'DP Lunas', lunas:'Lunas' };
     const stColor = { belum:'#f2f2f2;color:#888', dp:'#fdf3dc;color:#b7770d', lunas:'#e8f6ee;color:#1a6b3c' };
-    const totalAng = anggarans.reduce((s,a)=>s+(a.anggaran||0),0);
-    const totalReal = anggarans.reduce((s,a)=>s+(a.realisasi||0),0);
+    const stLabel = { semua:'Semua Pos', lunas:'Lunas', dp:'DP Lunas', belum:'Belum Bayar' };
+    const filteredAng = statusFilter === 'semua' ? anggarans : anggarans.filter(a => a.status === statusFilter);
+    const totalAng = filteredAng.reduce((s,a)=>s+(a.anggaran||0),0);
+    const totalReal = filteredAng.reduce((s,a)=>s+(a.realisasi||0),0);
     const sisa = totalAng - totalReal;
     const pct = totalAng>0?Math.round(totalReal/totalAng*100):0;
-    const rows = anggarans.map((a,i) => `
+    const rows = filteredAng.map((a,i) => `
       <tr>
         <td style="text-align:center">${i+1}</td>
         <td>${a.nama}${a.catatan?'<br><span style="font-size:10px;color:#aaa">'+a.catatan+'</span>':''}</td>
@@ -1203,8 +1275,8 @@ window.exportPage = function(type) {
     html = `
       <div class="print-page">
         <div class="print-header">
-          <div class="print-title">💰 Rekap Anggaran Biaya — Acara Khitan</div>
-          <div class="print-sub">Dicetak: ${now} &nbsp;|&nbsp; ${anggarans.length} pos anggaran</div>
+          <div class="print-title">💰 Rekap Anggaran — ${stLabel[statusFilter]} | Acara Khitan</div>
+          <div class="print-sub">Dicetak: ${now} &nbsp;|&nbsp; ${filteredAng.length} pos &nbsp;|&nbsp; Status: ${stLabel[statusFilter]}</div>
         </div>
         <div class="print-summary">
           <div class="print-sum-card"><div class="print-sum-label">Total Anggaran</div><div class="print-sum-val" style="font-size:13px">Rp ${Number(totalAng).toLocaleString('id')}</div></div>
